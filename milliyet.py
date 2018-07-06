@@ -8,7 +8,7 @@ sayi22 = 1
 dataStep3 =[]
 dataStep2 = []
 
-for x in range(1,32):
+for x in range(1,5):
 
     y = ""
     if x<10:
@@ -410,56 +410,61 @@ for x in range(1,32):
 
     haberSayisi = 1
     for url in urls:
-        uClient2 = urlopen(url)
-        page_html = uClient2.read()
-        uClient2.close()
 
-        page_soup = soup(page_html, "html.parser")
+        try:
+            uClient2 = urlopen(url)
+        except Exception as e:
+            print(e)
+        else:
+            page_html = uClient2.read()
+            uClient2.close()
 
-        
+            page_soup = soup(page_html, "html.parser")
 
-        item = {}
-        item["url"] = url
+            
 
-        temp = page_soup.findAll("div",{"class":"date"})
-        item['created-edited'] = temp[0].text
+            item = {}
+            item["url"] = url
 
-        temp = page_soup.findAll("h1",{"itemprop":"headline"})
-        item['headline'] = temp[0].text
+            temp = page_soup.findAll("div",{"class":"date"})
+            item['created-edited'] = temp[0].text
 
-        temp = page_soup.findAll("h2",{"itemprop":"description"})
-        item['description'] = temp[0].text
+            temp = page_soup.findAll("h1",{"itemprop":"headline"})
+            item['headline'] = temp[0].text
 
-        temp = page_soup.findAll("p")
-        text = []
-        i = 1
-        for txt  in temp:
-            parafs = {}
-            a = "p" + str(i)
-            parafs[a] = txt.text
-            text.append(parafs)
-            i = i +1 
-        item['text'] = text
+            temp = page_soup.findAll("h2",{"itemprop":"description"})
+            item['description'] = temp[0].text
 
-        temp = page_soup.findAll('img',{"class":"image"})
-        photo = []
-        i = 1
-        for pht  in temp:
-            print(pht["alt"])
-            photos = {}
-            a = "img" + str(i)
-            photos[a] = pht['src']
-            photo.append(photos)
-            i = i +1 
-        item['photo'] = photo
+            temp = page_soup.findAll("p")
+            text = []
+            i = 1
+            for txt  in temp:
+                parafs = {}
+                a = "p" + str(i)
+                parafs[a] = txt.text
+                text.append(parafs)
+                i = i +1 
+            item['text'] = text
 
-        son = {}
-        son["newsNumber"] = str(haberSayisi)
-        son["newsContent"] = item
+            temp = page_soup.findAll('img',{"class":"image"})
+            photo = []
+            i = 1
+            for pht  in temp:
+                print(pht["alt"])
+                photos = {}
+                a = "img" + str(i)
+                photos[a] = pht['src']
+                photo.append(photos)
+                i = i +1 
+            item['photo'] = photo
 
-        haberSayisi = haberSayisi + 1
+            son = {}
+            son["newsNumber"] = str(haberSayisi)
+            son["newsContent"] = item
 
-        data.append(son) # add the item to the list
+            haberSayisi = haberSayisi + 1
+
+            data.append(son) # add the item to the list
 
     son = {}
     son["date"] = y + "/01/2018"
