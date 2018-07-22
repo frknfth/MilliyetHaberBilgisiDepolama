@@ -1,8 +1,9 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 import json
+import datetime
 from pprint import pprint
-otl_urlAy = 'http://www.milliyet.com.tr/2016/'
+otl_urlAy = 'http://www.milliyet.com.tr/2018/'
 
 dataStep2 = []
 
@@ -37,7 +38,7 @@ for f in allDayArray:
 
 
 
-for y in range(1,2):
+for y in range(1,13):
 
     month =""
     if y <10:
@@ -49,7 +50,7 @@ for y in range(1,2):
 
 
 
-    for x in range(1,5):
+    for x in range(1,33):
         sayi22 = 1
 
         day = ""
@@ -64,12 +65,10 @@ for y in range(1,2):
         try:
             abc =True
             for f in allDayArray:
-                if day + "/" + month + "2016" in f:
+                if day + "/" + month + "2018" in f:
                     abc = False
                     print(abc)
                     break
-                else:
-                    print(abc)
 
             if(abc == True):
                 uClient = urlopen(otl_url)
@@ -286,6 +285,27 @@ for y in range(1,2):
                         item['lastEditDay'] = str(allDatesHours[2])[str(allDatesHours[2]).find(":")+1:str(allDatesHours[2]).find("-")]
                         item['lastEditHour'] =str(allDatesHours[2])[str(allDatesHours[2]).find("-")+1:str(allDatesHours[2]).rfind(" ")]
 
+                        date1 = str(item['createdDay']) + " " + str(item['createdHour']) 
+
+                        datetimeFormat = '%d.%m.%Y %H:%M' 
+
+                        date2 = str(item['lastEditDay']) + " " + str(item['lastEditHour']) 
+
+
+                        date11 = datetime.datetime.strptime(date1, datetimeFormat)
+
+                        date12 = datetime.datetime.strptime(date2,datetimeFormat)
+
+                        diff = date12 - date11
+
+                        days = diff.days
+                                                                                              
+                        minutes = (diff.seconds) / 60
+
+                        item['MinuteDiffBetweenDaysHours'] = str(minutes)
+
+
+
                         temp = page_soup.findAll("h1",{"itemprop":"headline"})
                         item['headline'] = temp[0].text
 
@@ -293,42 +313,62 @@ for y in range(1,2):
                         item['description'] = temp[0].text
 
                         temp = page_soup.findAll("p")
-                        text = []
-                        i = 1
+                        text = ""
                         for txt  in temp:
-                            parafs = {}
-                            a = "p" + str(i)
-                            parafs[a] = txt.text
-                            text.append(parafs)
-                            i = i +1 
+                            parafs = ""
+                            parafs = txt.text
+                            text +=parafs
                         item['text'] = text
 
                         temp = page_soup.findAll('img',{"class":"image"})
-                        photo = []
-                        i = 1
-                        for pht  in temp:
-                            print(pht["alt"])
-                            photos = {}
-                            a = "img" + str(i)
-                            photos[a] = pht['src']
-                            photo.append(photos)
-                            i = i +1 
 
-                        item['photo'] = photo
+                        print(temp[0]["alt"])
+
+                        photos = ""
+                        photos = temp[0]['src']
+
+                        item['photo'] = photos
+
+                        
+                        etiket= []
+                        productDivs = page_soup.findAll('div',{"class":"etiket"})
+
+                        for anA in productDivs[0].find_all("a"):
+                            Biretiket ={}
+                            Biretiket = anA.text
+                            etiket.append(Biretiket)
+
+                        item['tags'] = etiket
+
+
+                        productDivs = page_soup.findAll('div',{"class":"em2"})
+
+                        Biretiket ={}
+                        Biretiket["happy"] =        productDivs[0].find_all("span")[0].text
+                        Biretiket["confused"] =     productDivs[0].find_all("span")[1].text
+                        Biretiket["irresulate"] =   productDivs[0].find_all("span")[2].text
+                        Biretiket["mad"] =          productDivs[0].find_all("span")[3].text
+                        Biretiket["sad"] =          productDivs[0].find_all("span")[4].text
+
+                        Biretiket["totalVote"] =    str(int(productDivs[0].find_all("span")[0].text) + int(productDivs[0].find_all("span")[1].text) + int(productDivs[0].find_all("span")[2].text) + int(productDivs[0].find_all("span")[3].text) + int(productDivs[0].find_all("span")[4].text))
+
+                        item['statements'] = Biretiket
+
+
 
                         haberSayisi = haberSayisi + 1
 
                         data.append(item) # add the item to the list
                 
                     except Exception as e:
-                        continue                
+                        print(e)                
 
                 son = {}
-                son["date"] = day + "/" + month + "2016"
+                son["date"] = day + "/" + month + "2018"
                 son["theNewsOfTheDay"] = data
                 dataStep2.append(son)
         except Exception as e:
-            pass
+            print(e)
         
 
 
@@ -340,4 +380,3 @@ lastJson["allTheNews"] = dataStep2
 
 with open("store.json", "w", encoding='utf8') as writeJSON:
     json.dump(lastJson, writeJSON, ensure_ascii=False)    
-    
