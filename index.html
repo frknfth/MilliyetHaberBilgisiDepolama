@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h1> Most Voted News in Milliyet.com.tr </h1>
+	<p id="demo"></p>
+	<p id="happy"> </p>
+	<p id="confused"> </p>
+	<p id="irresulate"> </p>
+	<p id="mad"> </p>
+	<p id="sad"> </p>
+	<p id="totalVote"> </p>
+	
+	<h1> Which Day Has The Most News  </h1>
+	<p id="mostNewsDay"></p>
+	<p id="length"></p>
+	
+	<h1> Longest Minute Differens </h1>
+	<p id="mindiff"></p>
+	<p id="mindiffer"></p>
+	
+	<h1> How Many News on Months </h1>
+	<p id="date"></p>
+	<p id="0"></p>
+	<p id="1"></p>
+	<p id="2"></p>
+	<p id="3"></p>
+	<p id="4"></p>
+	<p id="5"></p>
+	<p id="6"></p>
+	<p id="7"></p>
+	<p id="8"></p>
+	<p id="9"></p>
+	<p id="10"></p>
+	<p id="11"></p>
+	
+	
+	<script>
+		//document.getElementById("demo").innerHTML = myObj.allTheNews[0].theNewsOfTheDay[5].statements.totalVote;
+		
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+    	if (this.readyState == 4 && this.status == 200) {
+			
+        	var myObj = JSON.parse(this.responseText);
+			
+			// finds the max voted news
+			var total = 0;
+			var news;
+			for(var i=0; i<myObj.allTheNews.length; i++){
+				for(var j=0;j<myObj.allTheNews[i].theNewsOfTheDay.length; j++){
+					var tempTotal = myObj.allTheNews[i].theNewsOfTheDay[j].statements.totalVote;
+					if( total < tempTotal ){
+						total =  tempTotal;
+						news = myObj.allTheNews[i].theNewsOfTheDay[j];
+					}
+				}	
+			}
+        	document.getElementById("demo").innerHTML = "News' Headline: " + news.headline ;
+			document.getElementById("happy").innerHTML = "Happy: " + news.statements.happy ;
+			document.getElementById("confused").innerHTML = "Confused: " + news.statements.confused ;
+			document.getElementById("irresulate").innerHTML = "Irresulate: " + news.statements.irresulate ;
+			document.getElementById("mad").innerHTML = "Mad: " + news.statements.mad ;
+			document.getElementById("sad").innerHTML = "Sad: " + news.statements.sad ;
+			document.getElementById("totalVote").innerHTML = "Total Vote: " + news.statements.totalVote ;
+			// end
+		
+			// Which Day Has The Most News
+			var total2 = 0;
+			var news2;
+			for(var i=0; i<myObj.allTheNews.length; i++){
+				
+				if(myObj.allTheNews[i].theNewsOfTheDay.length > total2){
+					total2 = myObj.allTheNews[i].theNewsOfTheDay.length;
+					news = myObj.allTheNews[i];
+				}
+				
+			}
+			document.getElementById("mostNewsDay").innerHTML = news.date ;
+			document.getElementById("length").innerHTML = "Number Of News: " + news.theNewsOfTheDay.length ;
+			// end
+			
+			// Minutes Differences
+			var diff = 0;
+			var tempNews;
+			for(var i=0; i<myObj.allTheNews.length; i++){
+				for(var j=0;j<myObj.allTheNews[i].theNewsOfTheDay.length; j++){
+					var tempDiff = myObj.allTheNews[i].theNewsOfTheDay[j].minuteDiffBetweenDaysHours;
+					if( 999.0 < tempDiff ){
+						diff =  tempDiff;
+						tempNews = myObj.allTheNews[i].theNewsOfTheDay[j];
+					}
+				}	
+			}
+			document.getElementById("mindiff").innerHTML = "News' HeadLine: " + tempNews.headline;
+			document.getElementById("mindiffer").innerHTML = "Minutes Difference: " + tempNews.minuteDiffBetweenDaysHours;
+			// end
+			
+			
+			//Month by Month news
+			var d = new Date("01/01/2018");
+			var n = d.getMonth();
+			var months = [0,0,0,0,0,0,0,0,0,0,0,0];
+			
+			for(var i=0; i<myObj.allTheNews.length; i++){
+				for(var j=0;j<myObj.allTheNews[i].theNewsOfTheDay.length; j++){
+					var x = new Date(myObj.allTheNews[i].date);
+					var y = x.getMonth();
+					months[y]++;
+				}
+			}
+			
+			document.getElementById("0").innerHTML = "January: " + months[0];
+			document.getElementById("1").innerHTML = "February: " + months[1];
+			document.getElementById("2").innerHTML = "March: " + months[2];
+			document.getElementById("3").innerHTML = "April: " + months[3];
+			document.getElementById("4").innerHTML = "May: " + months[4];
+			document.getElementById("5").innerHTML = "June: " + months[5];
+			document.getElementById("6").innerHTML = "July: " + months[6];
+			document.getElementById("7").innerHTML = "August: " + months[7];
+			document.getElementById("8").innerHTML = "September: " + months[8];
+			document.getElementById("9").innerHTML = "October: " + months[9];
+			document.getElementById("10").innerHTML = "November: " + months[10];
+			document.getElementById("11").innerHTML = "December: " + months[11];
+			//end
+			
+			
+			
+
+    	}
+		};
+		xmlhttp.open("GET", "store.json", true);
+		xmlhttp.send();
+
+	</script>
+	
+	
+	
+
+
+</body>
+</html>
